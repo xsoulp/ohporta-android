@@ -88,9 +88,9 @@ public final class UserListActivity extends Activity {
                     WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout()
             );
             view.setPadding(
-                    dp(22) + insets.left,
-                    dp(18) + insets.top,
-                    dp(22) + insets.right,
+                    dp(20) + insets.left,
+                    dp(12) + insets.top,
+                    dp(20) + insets.right,
                     dp(18) + insets.bottom
             );
             return windowInsets;

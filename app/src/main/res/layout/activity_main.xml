@@ -23,11 +23,9 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView android:layout_width="48dp" android:layout_height="48dp" android:contentDescription="" android:src="@drawable/ic_brand" />
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="sans-serif-medium" android:letterSpacing="0.04" android:text="@string/brand_name" android:textColor="@color/text_primary" android:textSize="21sp" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:fontFamily="sans-serif-light" android:letterSpacing="0.14" android:text="@string/your_entrance_always_with_you" android:textColor="@color/text_secondary" android:textSize="9sp" />
-            </LinearLayout>
+            <include layout="@layout/view_brand_banner"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" />
             <Button android:id="@+id/usersButton" android:layout_width="48dp" android:layout_height="48dp" android:layout_marginEnd="6dp" android:background="@drawable/button_secondary" android:contentDescription="@string/users" android:drawableTop="@drawable/ic_users" android:text="" android:visibility="gone" />
             <Button android:id="@+id/settingsButton" android:layout_width="48dp" android:layout_height="48dp" android:background="@drawable/button_secondary" android:contentDescription="@string/settings" android:drawableTop="@drawable/ic_settings" android:text="" />
         </LinearLayout>
