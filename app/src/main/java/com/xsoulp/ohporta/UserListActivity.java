@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowInsets;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +31,18 @@ public final class UserListActivity extends Activity {
     private static final String SETTINGS = "app_settings";
     private static final String SERVER_URL = "server_url";
     private static final String DEFAULT_SERVER_URL = "";
+
+    private static final int[] AVATARS = {
+            R.drawable.avatar_dog, R.drawable.avatar_fox, R.drawable.avatar_panda,
+            R.drawable.avatar_frog, R.drawable.avatar_koala, R.drawable.avatar_monkey,
+            R.drawable.avatar_lion, R.drawable.avatar_tiger, R.drawable.avatar_rabbit,
+            R.drawable.avatar_pig, R.drawable.avatar_cat, R.drawable.avatar_raccoon
+    };
+    private static final int[] AVATAR_BACKGROUNDS = {
+            0xFFF4E5D5, 0xFFFFE8CF, 0xFFE8E6F4, 0xFFE4EFCE,
+            0xFFE4EDEB, 0xFFF4E4D8, 0xFFFFECCC, 0xFFFFE4D5,
+            0xFFF4E4ED, 0xFFF9DFE5, 0xFFFFEDCE, 0xFFE3EAEF
+    };
     private static final List<String> WEEKDAYS = Arrays.asList(
             "monday", "tuesday", "wednesday", "thursday", "friday"
     );
@@ -166,14 +179,14 @@ public final class UserListActivity extends Activity {
         card.setFocusable(true);
         card.setOnClickListener(view -> openUser(user.id));
 
-        TextView initials = new TextView(this);
-        initials.setText(initials(user.name));
-        initials.setTextSize(21);
-        initials.setTextColor(getColor(R.color.text_primary));
-        initials.setGravity(Gravity.CENTER);
-        initials.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        initials.setBackground(roundRect(Color.rgb(231, 237, 244), 48));
-        card.addView(initials, new LinearLayout.LayoutParams(dp(64), dp(64)));
+        int avatarIndex = Math.floorMod(user.id, AVATARS.length);
+        ImageView avatar = new ImageView(this);
+        avatar.setImageResource(AVATARS[avatarIndex]);
+        avatar.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        avatar.setPadding(dp(8), dp(8), dp(8), dp(8));
+        avatar.setBackground(roundRect(AVATAR_BACKGROUNDS[avatarIndex], 32));
+        avatar.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        card.addView(avatar, new LinearLayout.LayoutParams(dp(64), dp(64)));
 
         LinearLayout details = new LinearLayout(this);
         details.setOrientation(LinearLayout.VERTICAL);
@@ -234,18 +247,6 @@ public final class UserListActivity extends Activity {
             case "sunday": return getString(R.string.sun);
             default: return day;
         }
-    }
-
-    private String initials(String name) {
-        String[] parts = name.trim().split("\\s+");
-        if (parts.length == 0 || parts[0].isEmpty()) {
-            return "?";
-        }
-        String result = parts[0].substring(0, 1);
-        if (parts.length > 1) {
-            result += parts[parts.length - 1].substring(0, 1);
-        }
-        return result.toUpperCase(Locale.ROOT);
     }
 
     private TextView text(String value, int size, int color, boolean bold) {

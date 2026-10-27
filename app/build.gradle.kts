@@ -10,8 +10,8 @@ android {
         applicationId = "com.xsoulp.ohporta"
         minSdk = 30
         targetSdk = 36
-        versionCode = 7
-        versionName = "1.6"
+        versionCode = 8
+        versionName = "1.7"
 
         buildConfigField("boolean", "USE_BIOMETRIC_AUTH", "true")
     }

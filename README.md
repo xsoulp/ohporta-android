@@ -42,15 +42,8 @@ Actual app screens captured on a Google Pixel 8a. The Preview build uses fiction
   </tr>
 </table>
 
-<details>
-<summary><strong>Português de Portugal</strong></summary>
+See the [Portuguese interface screenshots](docs/SCREENSHOTS.md) for PT-PT examples.
 
-<p align="center">
-  <img src="docs/images/home-pt.png" alt="Ecrã principal real da aplicação em português de Portugal" width="360">
-  <img src="docs/images/schedules-pt.png" alt="Edição real de utilizadores e horários em português de Portugal" width="360">
-</p>
-
-</details>
 
 ## Features
 
@@ -59,7 +52,7 @@ Actual app screens captured on a Google Pixel 8a. The Preview build uses fiction
 | **Door controls** | Open the building entrance; open, lock, and unlock the apartment door. |
 | **Device authentication** | Confirm each door operation with a strong biometric, such as a fingerprint, or the device PIN, pattern, or password. |
 | **Location-aware access** | Send location with requests and display access capabilities returned by the server. Local access uses a fixed 100 m zone; remote access has no distance limit. |
-| **User administration** | Administrators can search, create, edit, enable, disable, and delete users. |
+| **User administration** | Administrators can search, create, edit, enable, disable, and delete users. Each account has a consistent animal avatar, bundled for offline display. |
 | **Weekly schedules** | Add multiple access periods and choose the permitted days of the week. |
 | **Recent activity** | Administrators can view access history for the last two days, with up to five visible rows and scrolling within the list. |
 | **Protected credentials** | Store the bearer token encrypted with AES-GCM using a key held in Android Keystore. |
@@ -70,8 +63,8 @@ Get the APKs from [GitHub Releases](../../releases):
 
 | APK | Authentication |
 | :--- | :--- |
-| [**Fingerprint APK**](../../releases/download/v1.6/OhPorta-1.6-fingerprint.apk) | Strong biometric authentication with device PIN, pattern, or password as a fallback. |
-| [**PIN APK**](../../releases/download/v1.6/OhPorta-1.6-pin.apk) | Device PIN, pattern, or password, without prompting for a fingerprint. |
+| [**Fingerprint APK**](../../releases/download/v1.7/OhPorta-1.7-fingerprint.apk) | Strong biometric authentication with device PIN, pattern, or password as a fallback. |
+| [**PIN APK**](../../releases/download/v1.7/OhPorta-1.7-pin.apk) | Device PIN, pattern, or password, without prompting for a fingerprint. |
 
 Both variants require Android 11+ and a configured screen lock. The published APKs use the same app ID (`com.xsoulp.ohporta`) and signing key, so installing one replaces the other while keeping settings. The APKs use debug signing and are sideload builds. Updates within OhPorta preserve saved settings. OhPorta has a new application ID, so it installs separately from the former APT Access app; users moving from that app need to configure their server and token. Independently built APKs may use a different signing key.
 
@@ -105,7 +98,7 @@ The app identifies the user from the token. Administrator controls appear for us
 | Minimum Android | 11 / API 30 |
 | Android Gradle Plugin | 9.4.0 |
 | Gradle wrapper | 9.6.0 |
-| App | 1.6 |
+| App | 1.7 |
 
 Install the Android SDK and configure its location using `ANDROID_HOME` or an untracked `local.properties` file with `sdk.dir` pointing to your SDK directory. Then run:
 
@@ -140,6 +133,8 @@ See the [backend API guide](docs/BACKEND.md) for server requirements, authentica
 - **Tokens are encrypted at rest.** The bearer token is encrypted with AES-256-GCM and a key in Android Keystore. Android application backups are disabled.
 - **Door actions require device authentication.** Access rules, schedules, and administrator privileges must also be enforced by the backend.
 - **Location is shared with your server.** Client-reported GPS coordinates can be spoofed. Device authentication does not make them cryptographic proof of physical presence.
+
+Animal artwork: [Twemoji](https://github.com/twitter/twemoji), CC BY 4.0. See [third-party notices](docs/THIRD_PARTY_NOTICES.md).
 
 Created by **Luis Pinto** · 2026
 
