@@ -19,6 +19,8 @@ OhPorta is a native Android client with English and European Portuguese interfac
 
 **Bring your own backend.** No server is configured by default. You need a compatible access-control API and a bearer token issued by its administrator. This repository contains the Android app; the server and door hardware are separate.
 
+The [OhPorta Android app](https://github.com/xsoulp/ohporta-android) is an independent project, maintained and released separately from `ohporta-core`. It can connect to any backend that implements the [documented API](docs/BACKEND.md).
+
 ## Screenshots
 
 Actual app screens captured on a Google Pixel 8a. The Preview build uses fictional users and a local demonstration API; no personal server address or credentials appear in these images.
