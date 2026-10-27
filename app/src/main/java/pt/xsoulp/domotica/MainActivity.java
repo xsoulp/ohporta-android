@@ -36,8 +36,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,12 +54,13 @@ public final class MainActivity extends Activity {
     private static final float MAX_CACHED_LOCATION_ACCURACY_M = 100.0f;
     private static final String SETTINGS = "app_settings";
     private static final String SERVER_URL = "server_url";
-    private static final String DEFAULT_SERVER_URL = "https://example.invalid";
-    private static final String LEGACY_SERVER_HOST = "192.0.2.1";
+    private static final String DEFAULT_SERVER_URL = "";
     private static final int ACCESS_HISTORY_LIMIT = 30;
+    private static final int ACCESS_HISTORY_DAYS = 2;
     private static final String PENDING_AUTH_PATH = "pending_auth_path";
 
     private final ExecutorService networkExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService historyExecutor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private SharedPreferences settings;
@@ -77,6 +83,7 @@ public final class MainActivity extends Activity {
     private boolean bldCanOpen;
     private boolean adminUser;
     private int capabilitiesGeneration;
+    private int historyGeneration;
     private String pendingAuthenticationPath;
 
     private interface LocationCallback {
@@ -96,10 +103,6 @@ public final class MainActivity extends Activity {
         }
 
         settings = getSharedPreferences(SETTINGS, MODE_PRIVATE);
-        String configuredServer = settings.getString(SERVER_URL, DEFAULT_SERVER_URL);
-        if (configuredServer != null && configuredServer.contains(LEGACY_SERVER_HOST)) {
-            settings.edit().putString(SERVER_URL, DEFAULT_SERVER_URL).apply();
-        }
         secretStore = new SecretStore(this);
         statusText = findViewById(R.id.statusText);
         connectivityText = findViewById(R.id.connectivityText);
@@ -117,26 +120,31 @@ public final class MainActivity extends Activity {
         accessHistoryMessage = findViewById(R.id.accessHistoryMessage);
         aptInteractionLayer.setOnClickListener(view -> {
             if (aptCanOpen) {
-                beginOperation("/apt_door/open", "Abrir apartamento");
+                beginOperation("/apt_door/open", getString(R.string.open_apartment));
             } else {
-                setStatus("Abertura APT indisponível", true);
+                setStatus(getString(R.string.apartment_opening_unavailable), true);
             }
         });
         aptInteractionLayer.setOnLongClickListener(view -> {
             showAptActions();
             return true;
         });
-        openBuildingButton.setOnClickListener(view -> beginOperation("/bld_door", "Abrir prédio"));
+        openBuildingButton.setOnClickListener(view -> beginOperation("/bld_door", getString(R.string.open_building)));
         findViewById(R.id.settingsButton).setOnClickListener(view -> showSettings());
         usersButton.setOnClickListener(view -> startActivity(
                 new Intent(this, UserListActivity.class)
         ));
         usersButton.setVisibility(View.GONE);
 
-        disableOpening("A verificar…");
+        disableOpening(getString(R.string.checking_2));
+
+        if (settings.getString(SERVER_URL, DEFAULT_SERVER_URL).trim().isEmpty()) {
+            capabilitiesFailed(getString(R.string.set_your_server_in_settings));
+            return;
+        }
         requestLocationPermissionIfNeeded();
         if (!secretStore.hasBearer()) {
-            statusText.setText("Configura o bearer nas Definições");
+            statusText.setText(getString(R.string.set_your_bearer_token_in_settings));
         }
     }
 
@@ -153,6 +161,10 @@ public final class MainActivity extends Activity {
     }
 
     private void beginOperation(String path, String title) {
+        if (settings.getString(SERVER_URL, DEFAULT_SERVER_URL).trim().isEmpty()) {
+            showSettings();
+            return;
+        }
         if (!secretStore.hasBearer()) {
             showSettings();
             return;
@@ -166,11 +178,11 @@ public final class MainActivity extends Activity {
                     },
                     LOCATION_PERMISSION_REQUEST
             );
-            setStatus("É necessário permitir a localização", true);
+            setStatus(getString(R.string.location_permission_is_required), true);
             return;
         }
         if (!hasNetwork()) {
-            setStatus("Sem ligação de rede", true);
+            setStatus(getString(R.string.no_network_connection), true);
             return;
         }
 
@@ -183,6 +195,11 @@ public final class MainActivity extends Activity {
     }
 
     private void authenticateForOperation(String path, String title) {
+        if (!BuildConfig.USE_BIOMETRIC_AUTH) {
+            authenticateWithDeviceCredential(path, title);
+            return;
+        }
+
         BiometricManager manager = getSystemService(BiometricManager.class);
         boolean biometricAvailable = manager != null
                 && manager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)
@@ -195,10 +212,10 @@ public final class MainActivity extends Activity {
 
         BiometricPrompt prompt = new BiometricPrompt.Builder(this)
                 .setTitle(title)
-                .setSubtitle("Confirma com a impressão digital")
+                .setSubtitle(getString(R.string.confirm_with_your_fingerprint))
                 .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
                 .setNegativeButton(
-                        "Usar PIN",
+                        getString(R.string.use_pin),
                         getMainExecutor(),
                         (dialog, which) -> authenticateWithDeviceCredential(path, title)
                 )
@@ -228,7 +245,7 @@ public final class MainActivity extends Activity {
 
                     @Override
                     public void onAuthenticationFailed() {
-                        setStatus("Impressão digital não reconhecida", true);
+                        setStatus(getString(R.string.fingerprint_not_recognised), true);
                     }
                 }
         );
@@ -237,16 +254,16 @@ public final class MainActivity extends Activity {
     private void authenticateWithDeviceCredential(String path, String title) {
         KeyguardManager keyguardManager = getSystemService(KeyguardManager.class);
         if (keyguardManager == null || !keyguardManager.isDeviceSecure()) {
-            setStatus("Configura um PIN, padrão ou palavra-passe no telemóvel", true);
+            setStatus(getString(R.string.set_up_a_device_pin_pattern_or_password), true);
             return;
         }
 
         Intent intent = keyguardManager.createConfirmDeviceCredentialIntent(
                 title,
-                "Confirma com o PIN, padrão ou palavra-passe do telemóvel"
+                getString(R.string.confirm_with_your_device_pin_pattern_or_password)
         );
         if (intent == null) {
-            setStatus("Não foi possível abrir a autenticação do telemóvel", true);
+            setStatus(getString(R.string.could_not_open_device_authentication), true);
             return;
         }
 
@@ -270,7 +287,7 @@ public final class MainActivity extends Activity {
     }
 
     private void obtainLocationAndSend(String path) {
-        setBusy(true, "A obter localização precisa…");
+        setBusy(true, getString(R.string.getting_precise_location));
         obtainCurrentLocation(new LocationCallback() {
             @Override
             public void onLocation(Location location) {
@@ -288,13 +305,13 @@ public final class MainActivity extends Activity {
     private void obtainCurrentLocation(LocationCallback callback) {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            callback.onError("Permissão de localização em falta");
+            callback.onError(getString(R.string.location_permission_missing));
             return;
         }
 
         LocationManager manager = getSystemService(LocationManager.class);
         if (manager == null) {
-            callback.onError("Serviço de localização indisponível");
+            callback.onError(getString(R.string.location_service_unavailable));
             return;
         }
 
@@ -306,7 +323,7 @@ public final class MainActivity extends Activity {
 
         String provider = findEnabledLocationProvider(manager);
         if (provider == null) {
-            callback.onError("Ativa a localização nas Definições");
+            callback.onError(getString(R.string.enable_location_in_settings));
             return;
         }
 
@@ -318,7 +335,7 @@ public final class MainActivity extends Activity {
                 if (locationCancellation == cancellation) {
                     locationCancellation = null;
                 }
-                callback.onError("Não foi possível obter a localização");
+                callback.onError(getString(R.string.could_not_get_location));
             }
         };
         mainHandler.postDelayed(timeout, 15_000);
@@ -333,7 +350,7 @@ public final class MainActivity extends Activity {
                         locationCancellation = null;
                     }
                     if (location == null) {
-                        callback.onError("Localização indisponível");
+                        callback.onError(getString(R.string.location_unavailable));
                     } else {
                         callback.onLocation(location);
                     }
@@ -362,14 +379,14 @@ public final class MainActivity extends Activity {
     }
 
     private void showEnableLocationDialog() {
-        setStatus("Ativa a localização nas Definições", true);
+        setStatus(getString(R.string.enable_location_in_settings), true);
         new AlertDialog.Builder(this)
-                .setTitle("Localização desativada")
-                .setMessage("A localização precisa é necessária para validar a proximidade das portas.")
-                .setPositiveButton("Abrir Definições", (dialog, which) -> startActivity(
+                .setTitle(getString(R.string.location_disabled))
+                .setMessage(getString(R.string.precise_location_is_required_to_check_your_distance_from_the_door))
+                .setPositiveButton(getString(R.string.open_settings), (dialog, which) -> startActivity(
                         new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 ))
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 
@@ -407,19 +424,24 @@ public final class MainActivity extends Activity {
         bldCanOpen = false;
         adminUser = false;
         accessHistorySection.setVisibility(View.GONE);
-        disableOpening("A verificar…");
+        disableOpening(getString(R.string.checking_2));
+
+        if (settings.getString(SERVER_URL, DEFAULT_SERVER_URL).trim().isEmpty()) {
+            capabilitiesFailed(getString(R.string.set_your_server_in_settings));
+            return;
+        }
 
         if (!secretStore.hasBearer()) {
-            capabilitiesFailed("Configura o bearer nas Definições");
+            capabilitiesFailed(getString(R.string.set_your_bearer_token_in_settings));
             return;
         }
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            capabilitiesFailed("Permissão de localização em falta");
+            capabilitiesFailed(getString(R.string.location_permission_missing));
             return;
         }
         if (!hasNetwork()) {
-            capabilitiesFailed("Sem ligação de rede");
+            capabilitiesFailed(getString(R.string.no_network_connection));
             return;
         }
 
@@ -427,7 +449,7 @@ public final class MainActivity extends Activity {
         try {
             bearer = secretStore.getBearer();
         } catch (Exception error) {
-            capabilitiesFailed("Não foi possível ler o bearer");
+            capabilitiesFailed(getString(R.string.could_not_read_the_bearer_token));
             return;
         }
 
@@ -436,7 +458,7 @@ public final class MainActivity extends Activity {
             locationCancellation = null;
         }
         progressBar.setVisibility(View.VISIBLE);
-        setStatus("A verificar acessos…", false);
+        setStatus(getString(R.string.checking_access), false);
         obtainCurrentLocation(new LocationCallback() {
             @Override
             public void onLocation(Location location) {
@@ -487,13 +509,13 @@ public final class MainActivity extends Activity {
                         );
                         aptInteractionLayer.setContentDescription(
                                 result.apartment.canOpen
-                                        ? "Abrir porta do apartamento. Manter premido para mais ações."
-                                        : "Abertura APT indisponível. Manter premido para Lock ou Unlock."
+                                        ? getString(R.string.open_apartment_door_press_and_hold_for_more_actions)
+                                        : getString(R.string.apartment_opening_unavailable_press_and_hold_to_lock_or_unlock)
                         );
                         if (adminUser) {
                             loadAccessHistory();
                         }
-                        setStatus("Acessos atualizados", false);
+                        setStatus(getString(R.string.access_updated), false);
                     });
                 });
             }
@@ -516,14 +538,14 @@ public final class MainActivity extends Activity {
         String distance = formatDistance(capability.distanceM);
         title.setText(doorName);
         if (!capability.canOpen) {
-            button.setContentDescription("Abertura " + doorName + " indisponível");
+            button.setContentDescription(getString(R.string.door_unavailable, doorName));
         } else if (capability.mode.equals("remote")) {
             button.setContentDescription(
-                    "Abrir " + doorName + " remotamente" + (distance.isEmpty() ? "" : ", " + distance)
+                    getString(R.string.open_door_remote, doorName, distance.isEmpty() ? "" : ", " + distance)
             );
         } else {
             button.setContentDescription(
-                    "Abrir " + doorName + (distance.isEmpty() ? "" : ", " + distance)
+                    getString(R.string.open_door_distance, doorName, distance.isEmpty() ? "" : ", " + distance)
             );
         }
         button.setEnabled(capability.canOpen);
@@ -551,12 +573,12 @@ public final class MainActivity extends Activity {
     }
 
     private void updateResidenceStatus(boolean online, Double distanceM, boolean locating) {
-        String state = online ? "Online" : "Sem ligação";
+        String state = online ? getString(R.string.online) : getString(R.string.offline);
         String distance = formatDistance(distanceM);
         String suffix = locating
-                ? "  •  A localizar…"
+                ? getString(R.string.locating)
                 : (distance.isEmpty() ? "" : "  •  " + distance);
-        String text = "Minha Residência\n●  " + state + suffix;
+        String text = getString(R.string.my_residence_n) + state + suffix;
         SpannableString styled = new SpannableString(text);
         int dot = text.indexOf('●');
         styled.setSpan(
@@ -573,8 +595,8 @@ public final class MainActivity extends Activity {
         bldCanOpen = false;
         aptActionTitle.setText("APT");
         bldActionTitle.setText("BLD");
-        openApartmentButton.setContentDescription("Abertura APT indisponível: " + state);
-        openBuildingButton.setContentDescription("Abertura BLD indisponível: " + state);
+        openApartmentButton.setContentDescription(getString(R.string.apartment_opening_unavailable_2) + state);
+        openBuildingButton.setContentDescription(getString(R.string.building_opening_unavailable) + state);
         openApartmentButton.setEnabled(false);
         openBuildingButton.setEnabled(false);
         openApartmentButton.setAlpha(0.45f);
@@ -583,7 +605,7 @@ public final class MainActivity extends Activity {
 
     private void capabilitiesFailed(String message) {
         progressBar.setVisibility(View.GONE);
-        disableOpening("INDISPONÍVEL");
+        disableOpening(getString(R.string.unavailable));
         updateResidenceStatus(hasNetwork(), null, false);
         setStatus(message, true);
     }
@@ -597,37 +619,61 @@ public final class MainActivity extends Activity {
         try {
             bearer = secretStore.getBearer();
         } catch (Exception error) {
-            accessHistoryMessage.setText("Indisponível");
+            accessHistoryMessage.setText(getString(R.string.unavailable_2));
             return;
         }
-        int generation = capabilitiesGeneration;
-        accessHistoryMessage.setText("A atualizar…");
+        int capabilityGeneration = capabilitiesGeneration;
+        int requestGeneration = ++historyGeneration;
+        accessHistoryMessage.setText(getString(R.string.updating));
         String serverUrl = settings.getString(SERVER_URL, DEFAULT_SERVER_URL);
-        networkExecutor.execute(() -> {
+        historyExecutor.execute(() -> {
             ApiClient.AccessHistoryResult result = ApiClient.getAccessHistory(
                     serverUrl,
                     bearer,
                     ACCESS_HISTORY_LIMIT
             );
+            List<ApiClient.AccessEvent> recentEntries = result.successful
+                    ? keepRecentAccesses(result.entries)
+                    : Collections.emptyList();
             runOnUiThread(() -> {
-                if (generation != capabilitiesGeneration || !adminUser || isDestroyed()) {
+                if (capabilityGeneration != capabilitiesGeneration
+                        || requestGeneration != historyGeneration
+                        || !adminUser
+                        || isDestroyed()) {
                     return;
                 }
                 if (!result.successful) {
-                    accessHistoryMessage.setText("Indisponível");
+                    accessHistoryMessage.setText(getString(R.string.unavailable_2));
                     return;
                 }
                 accessHistoryMessage.setText("");
-                renderAccessHistory(result.entries);
+                renderAccessHistory(recentEntries);
             });
         });
+    }
+
+    private List<ApiClient.AccessEvent> keepRecentAccesses(
+            List<ApiClient.AccessEvent> entries
+    ) {
+        Instant cutoff = Instant.now().minus(ACCESS_HISTORY_DAYS, ChronoUnit.DAYS);
+        List<ApiClient.AccessEvent> recent = new ArrayList<>();
+        for (ApiClient.AccessEvent entry : entries) {
+            try {
+                if (!OffsetDateTime.parse(entry.openedAt).toInstant().isBefore(cutoff)) {
+                    recent.add(entry);
+                }
+            } catch (DateTimeParseException ignored) {
+                // Ignore malformed timestamps so the two-day window remains strict.
+            }
+        }
+        return Collections.unmodifiableList(recent);
     }
 
     private void renderAccessHistory(java.util.List<ApiClient.AccessEvent> entries) {
         accessHistoryContainer.removeAllViews();
         if (entries.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("Ainda não há aberturas registadas.");
+            empty.setText(getString(R.string.no_access_events_in_the_last_2_days));
             empty.setTextColor(getColor(R.color.text_secondary));
             empty.setTextSize(12);
             empty.setPadding(0, dp(20), 0, dp(12));
@@ -650,12 +696,12 @@ public final class MainActivity extends Activity {
     private String historyActionLabel(String action) {
         switch (action) {
             case "lock":
-                return "Trancar";
+                return getString(R.string.lock_2);
             case "unlock":
-                return "Destrancar";
+                return getString(R.string.unlock_2);
             case "open":
             default:
-                return "Abrir";
+                return getString(R.string.open);
         }
     }
 
@@ -674,17 +720,17 @@ public final class MainActivity extends Activity {
         try {
             bearer = secretStore.getBearer();
         } catch (Exception error) {
-            setBusy(false, "Não foi possível ler o bearer");
+            setBusy(false, getString(R.string.could_not_read_the_bearer_token));
             statusText.setTextColor(getColor(R.color.danger));
             return;
         }
 
         String serverUrl = settings.getString(SERVER_URL, DEFAULT_SERVER_URL);
-        setBusy(true, "A executar…");
+        setBusy(true, getString(R.string.running));
         networkExecutor.execute(() -> {
             ApiClient.Result result = ApiClient.post(serverUrl, path, bearer, location);
             runOnUiThread(() -> {
-                setBusy(false, result.successful ? "Concluído" : result.message);
+                setBusy(false, result.successful ? getString(R.string.done) : result.message);
                 statusText.setTextColor(getColor(
                         result.successful ? R.color.primary_dark : R.color.danger
                 ));
@@ -724,17 +770,17 @@ public final class MainActivity extends Activity {
         View unlock = sheet.findViewById(R.id.sheetUnlockButton);
         open.setEnabled(aptCanOpen);
         open.setAlpha(aptCanOpen ? 1.0f : 0.42f);
-        open.setContentDescription(aptCanOpen ? "Abrir porta do apartamento" : "Abertura APT indisponível");
+        open.setContentDescription(aptCanOpen ? getString(R.string.open_apartment_door) : getString(R.string.apartment_opening_unavailable));
 
         sheet.findViewById(R.id.closeSheetButton).setOnClickListener(view -> sheet.dismiss());
         open.setOnClickListener(view -> runSheetAction(
-                sheet, "/apt_door/open", "Abrir apartamento"
+                sheet, "/apt_door/open", getString(R.string.open_apartment)
         ));
         lock.setOnClickListener(view -> runSheetAction(
-                sheet, "/apt_door/lock", "Trancar"
+                sheet, "/apt_door/lock", getString(R.string.lock_2)
         ));
         unlock.setOnClickListener(view -> runSheetAction(
-                sheet, "/apt_door/unlock", "Destrancar"
+                sheet, "/apt_door/unlock", getString(R.string.unlock_2)
         ));
 
         sheet.show();
@@ -758,7 +804,7 @@ public final class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         boolean online = hasNetwork();
-        connectivityText.setText(online ? "Ligado ao serviço" : "Sem ligação ao serviço");
+        connectivityText.setText(online ? getString(R.string.connected_to_service) : getString(R.string.disconnected_from_service));
         connectivityText.setTextColor(getColor(online ? R.color.success : R.color.danger));
         updateResidenceStatus(online, null, online);
         refreshCapabilities();
@@ -776,7 +822,7 @@ public final class MainActivity extends Activity {
                     == PackageManager.PERMISSION_GRANTED) {
                 refreshCapabilities();
             } else {
-                capabilitiesFailed("Permite a localização precisa para continuar");
+                capabilitiesFailed(getString(R.string.allow_precise_location_to_continue));
             }
         }
     }
@@ -820,10 +866,12 @@ public final class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         capabilitiesGeneration++;
+        historyGeneration++;
         if (locationCancellation != null) {
             locationCancellation.cancel();
         }
         networkExecutor.shutdownNow();
+        historyExecutor.shutdownNow();
         super.onDestroy();
     }
 }

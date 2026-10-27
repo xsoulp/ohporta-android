@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
 public final class UserListActivity extends Activity {
     private static final String SETTINGS = "app_settings";
     private static final String SERVER_URL = "server_url";
-    private static final String DEFAULT_SERVER_URL = "https://example.invalid";
+    private static final String DEFAULT_SERVER_URL = "";
     private static final List<String> WEEKDAYS = Arrays.asList(
             "monday", "tuesday", "wednesday", "thursday", "friday"
     );
@@ -92,15 +92,19 @@ public final class UserListActivity extends Activity {
     }
 
     private void loadUsers() {
+        if (settings.getString(SERVER_URL, DEFAULT_SERVER_URL).trim().isEmpty()) {
+            showError(getString(R.string.server_not_configured_in_settings));
+            return;
+        }
         if (!secretStore.hasBearer()) {
-            showError("Bearer não configurado");
+            showError(getString(R.string.bearer_token_not_configured));
             return;
         }
         final String bearer;
         try {
             bearer = secretStore.getBearer();
         } catch (Exception error) {
-            showError("Não foi possível ler o bearer");
+            showError(getString(R.string.could_not_read_the_bearer_token));
             return;
         }
         progressBar.setVisibility(View.VISIBLE);
@@ -137,7 +141,7 @@ public final class UserListActivity extends Activity {
             usersContainer.addView(createUserCard(user));
         }
         if (usersContainer.getChildCount() == 0 && progressBar.getVisibility() != View.VISIBLE) {
-            messageText.setText(normalized.isEmpty() ? "Sem utilizadores" : "Nenhum resultado");
+            messageText.setText(normalized.isEmpty() ? getString(R.string.no_users) : getString(R.string.no_results));
             messageText.setTextColor(getColor(R.color.text_secondary));
             messageText.setVisibility(View.VISIBLE);
         } else {
@@ -177,13 +181,13 @@ public final class UserListActivity extends Activity {
         detailsParams.setMargins(dp(15), 0, dp(8), 0);
         card.addView(details, detailsParams);
         details.addView(text(user.name, 19, R.color.text_primary, true));
-        details.addView(text("admin".equals(user.role) ? "Administrador" : "Utilizador", 14, R.color.text_secondary, false));
+        details.addView(text("admin".equals(user.role) ? getString(R.string.administrator) : getString(R.string.user), 14, R.color.text_secondary, false));
         if (!"admin".equals(user.role)) {
             details.addView(text(scheduleSummary(user.schedules), 13, R.color.text_secondary, false));
-            details.addView(text(user.allowRemote ? "Remoto" : "Local apenas", 13, R.color.text_secondary, false));
+            details.addView(text(user.allowRemote ? getString(R.string.remote) : getString(R.string.local_only), 13, R.color.text_secondary, false));
         }
 
-        TextView status = text(user.enabled ? "●  Ativo" : "●  Inativo", 14,
+        TextView status = text(user.enabled ? getString(R.string.active) : getString(R.string.inactive), 14,
                 user.enabled ? R.color.success : R.color.text_secondary, false);
         card.addView(status);
         TextView arrow = text("›", 32, R.color.text_primary, false);
@@ -198,15 +202,15 @@ public final class UserListActivity extends Activity {
 
     private String scheduleSummary(List<ApiClient.Schedule> schedules) {
         if (schedules.isEmpty()) {
-            return "Sem horário permitido";
+            return getString(R.string.no_access_schedule);
         }
         List<String> parts = new ArrayList<>();
         for (ApiClient.Schedule schedule : schedules) {
             String days;
             if (schedule.allowedDays.equals(ALL_DAYS)) {
-                days = "Todos os dias";
+                days = getString(R.string.every_day);
             } else if (schedule.allowedDays.equals(WEEKDAYS)) {
-                days = "Seg–Sex";
+                days = getString(R.string.mon_fri);
             } else {
                 List<String> labels = new ArrayList<>();
                 for (String day : schedule.allowedDays) {
@@ -221,13 +225,13 @@ public final class UserListActivity extends Activity {
 
     private String dayLabel(String day) {
         switch (day) {
-            case "monday": return "Seg";
-            case "tuesday": return "Ter";
-            case "wednesday": return "Qua";
-            case "thursday": return "Qui";
-            case "friday": return "Sex";
-            case "saturday": return "Sáb";
-            case "sunday": return "Dom";
+            case "monday": return getString(R.string.mon);
+            case "tuesday": return getString(R.string.tue);
+            case "wednesday": return getString(R.string.wed);
+            case "thursday": return getString(R.string.thu);
+            case "friday": return getString(R.string.fri);
+            case "saturday": return getString(R.string.sat);
+            case "sunday": return getString(R.string.sun);
             default: return day;
         }
     }

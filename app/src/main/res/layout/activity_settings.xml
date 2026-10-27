@@ -9,10 +9,10 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:gravity="center_vertical" android:orientation="horizontal">
             <Button android:id="@+id/backButton" android:layout_width="52dp" android:layout_height="52dp"
-                android:background="@drawable/button_secondary" android:text="‹" android:textSize="30sp"
-                android:textColor="@color/text_primary" android:contentDescription="Voltar" />
+                android:background="@drawable/button_secondary" android:text="@string/back_symbol" android:textSize="30sp"
+                android:textColor="@color/text_primary" android:contentDescription="@string/back" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginStart="18dp" android:fontFamily="sans-serif-medium" android:text="Definições"
+                android:layout_marginStart="18dp" android:fontFamily="sans-serif-medium" android:text="@string/settings"
                 android:textColor="@color/text_primary" android:textSize="27sp" />
         </LinearLayout>
         <Space android:layout_width="1dp" android:layout_height="26dp" />
@@ -20,21 +20,21 @@
             android:background="@drawable/card_background" android:elevation="2dp" android:orientation="vertical" android:padding="20dp">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_antenna" android:drawablePadding="14dp"
-                android:gravity="center_vertical" android:text="Bearer" android:textColor="@color/text_primary"
+                android:gravity="center_vertical" android:text="@string/bearer_label" android:textColor="@color/text_primary"
                 android:textSize="20sp" android:textStyle="bold" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:text="Configura a credencial para comunicação com o sistema de acesso."
+                android:layout_marginTop="6dp" android:text="@string/set_the_credential_used_to_communicate_with_your_access_system"
                 android:textColor="@color/text_secondary" android:textSize="14sp" />
             <EditText android:id="@+id/bearerInput" android:layout_width="match_parent" android:layout_height="56dp"
                 android:layout_marginTop="16dp" android:background="@drawable/input_background"
-                android:hint="Bearer" android:importantForAutofill="no" android:inputType="textPassword"
+                android:hint="@string/bearer_label" android:importantForAutofill="no" android:inputType="textPassword"
                 android:paddingHorizontal="14dp" android:singleLine="true" />
             <EditText android:id="@+id/serverInput" android:layout_width="match_parent" android:layout_height="56dp"
                 android:layout_marginTop="10dp" android:background="@drawable/input_background"
-                android:hint="Endereço do servidor" android:importantForAutofill="no" android:inputType="textUri"
+                android:hint="@string/server_address" android:importantForAutofill="no" android:inputType="textUri"
                 android:paddingHorizontal="14dp" android:singleLine="true" />
             <Button android:id="@+id/saveButton" android:layout_width="match_parent" android:layout_height="58dp"
-                android:layout_marginTop="16dp" android:background="@drawable/button_primary" android:elevation="4dp" android:text="▣  Guardar"
+                android:layout_marginTop="16dp" android:background="@drawable/button_primary" android:elevation="4dp" android:text="@string/save_2"
                 android:textAllCaps="false" android:textColor="@android:color/white" android:textSize="16sp" android:textStyle="bold" />
         </LinearLayout>
         <Space android:layout_width="1dp" android:layout_height="18dp" />
@@ -42,32 +42,32 @@
             android:background="@drawable/card_background" android:elevation="2dp" android:orientation="vertical" android:padding="20dp">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_globe" android:drawablePadding="14dp"
-                android:gravity="center_vertical" android:text="Conectividade" android:textColor="@color/text_primary"
+                android:gravity="center_vertical" android:text="@string/connectivity" android:textColor="@color/text_primary"
                 android:textSize="20sp" android:textStyle="bold" />
             <TextView android:id="@+id/networkStatus" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="10dp" android:text="●  A verificar…" android:textSize="16sp" />
+                android:layout_marginTop="10dp" android:text="@string/checking" android:textSize="16sp" />
         </LinearLayout>
         <Space android:layout_width="1dp" android:layout_height="18dp" />
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:background="@drawable/card_background" android:elevation="2dp" android:orientation="vertical" android:padding="20dp">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_fingerprint" android:drawablePadding="14dp"
-                android:gravity="center_vertical" android:text="Autenticação" android:textColor="@color/text_primary"
+                android:drawableStart="@drawable/ic_lock" android:drawablePadding="14dp"
+                android:gravity="center_vertical" android:text="@string/authentication" android:textColor="@color/text_primary"
                 android:textSize="20sp" android:textStyle="bold" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:text="Impressão digital ou bloqueio de ecrã" android:textColor="@color/text_secondary" android:textSize="14sp" />
+                android:layout_marginTop="6dp" android:text="@string/secure_device_authentication" android:textColor="@color/text_secondary" android:textSize="14sp" />
             <TextView android:id="@+id/biometricStatus" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" android:text="●  A verificar…" android:textSize="16sp" />
+                android:layout_marginTop="8dp" android:text="@string/checking" android:textSize="16sp" />
         </LinearLayout>
         <Space android:layout_width="1dp" android:layout_height="18dp" />
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:background="@drawable/card_background" android:elevation="2dp" android:orientation="vertical" android:padding="20dp">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_info" android:drawablePadding="14dp"
-                android:gravity="center_vertical" android:text="Sobre" android:textColor="@color/text_primary"
+                android:gravity="center_vertical" android:text="@string/about" android:textColor="@color/text_primary"
                 android:textSize="20sp" android:textStyle="bold" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:text="APT Access\nVersão 1.3\nCriado por Luis Pinto"
+                android:layout_marginTop="6dp" android:text="@string/apt_access_nversion_1_5_ncreated_by_luis_pinto_2026"
                 android:textColor="@color/text_secondary" android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>

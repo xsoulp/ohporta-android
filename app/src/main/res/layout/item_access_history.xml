@@ -3,10 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:minHeight="52dp"
+    android:minHeight="44dp"
     android:orientation="horizontal"
     android:paddingHorizontal="2dp"
-    android:paddingVertical="8dp">
+    android:paddingVertical="4dp">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -16,6 +16,8 @@
 
         <TextView
             android:id="@+id/historyUser"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
@@ -24,6 +26,8 @@
 
         <TextView
             android:id="@+id/historyDoor"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"

@@ -35,11 +35,10 @@ public final class UserEditActivity extends Activity {
     static final String EXTRA_USER_ID = "user_id";
     private static final String SETTINGS = "app_settings";
     private static final String SERVER_URL = "server_url";
-    private static final String DEFAULT_SERVER_URL = "https://example.invalid";
+    private static final String DEFAULT_SERVER_URL = "";
     private static final String[] DAYS = {
             "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
     };
-    private static final String[] DAY_LABELS = {"Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"};
 
     private final ExecutorService networkExecutor = Executors.newSingleThreadExecutor();
     private final List<ScheduleRow> scheduleRows = new ArrayList<>();
@@ -118,7 +117,7 @@ public final class UserEditActivity extends Activity {
         deleteButton.setOnClickListener(view -> confirmDelete());
 
         if (userId < 0) {
-            titleText.setText("Novo utilizador");
+            titleText.setText(getString(R.string.new_user));
             deleteButton.setVisibility(View.GONE);
             enabledSwitch.setChecked(true);
             remoteSwitch.setChecked(false);
@@ -172,7 +171,7 @@ public final class UserEditActivity extends Activity {
         enabledSwitch.setChecked(user.enabled);
         remoteSwitch.setChecked(user.allowRemote);
         boolean admin = "admin".equals(user.role);
-        roleText.setText(admin ? "Administrador" : "Utilizador");
+        roleText.setText(admin ? getString(R.string.administrator) : getString(R.string.user));
         accessSection.setVisibility(admin ? View.GONE : View.VISIBLE);
         scheduleSection.setVisibility(admin ? View.GONE : View.VISIBLE);
         periodsContainer.removeAllViews();
@@ -221,9 +220,9 @@ public final class UserEditActivity extends Activity {
         List<ToggleButton> buttons = new ArrayList<>();
         for (int index = 0; index < DAYS.length; index++) {
             ToggleButton button = new ToggleButton(this);
-            button.setTextOn(DAY_LABELS[index]);
-            button.setTextOff(DAY_LABELS[index]);
-            button.setText(DAY_LABELS[index]);
+            button.setTextOn(getResources().getStringArray(R.array.weekdays_short)[index]);
+            button.setTextOff(getResources().getStringArray(R.array.weekdays_short)[index]);
+            button.setText(getResources().getStringArray(R.array.weekdays_short)[index]);
             button.setTextSize(12);
             button.setAllCaps(false);
             button.setBackgroundResource(R.drawable.schedule_day_background);
@@ -276,7 +275,7 @@ public final class UserEditActivity extends Activity {
     private void save() {
         String name = nameInput.getText().toString().trim();
         if (name.isEmpty()) {
-            nameInput.setError("Nome obrigatório");
+            nameInput.setError(getString(R.string.name_required));
             return;
         }
         List<ApiClient.Schedule> schedules = new ArrayList<>();
@@ -310,7 +309,7 @@ public final class UserEditActivity extends Activity {
                 } else if (userId < 0) {
                     showCreatedToken(result.createdToken);
                 } else {
-                    Toast.makeText(this, "Utilizador guardado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.user_saved), Toast.LENGTH_SHORT).show();
                     finish();
                 }
             });
@@ -319,7 +318,7 @@ public final class UserEditActivity extends Activity {
 
     private void showCreatedToken(String token) {
         if (token == null || token.isBlank()) {
-            showError("Utilizador criado, mas o servidor não devolveu o bearer");
+            showError(getString(R.string.user_created_but_the_server_did_not_return_a_token));
             return;
         }
         TextView tokenView = new TextView(this);
@@ -329,28 +328,28 @@ public final class UserEditActivity extends Activity {
         tokenView.setTextSize(14);
         tokenView.setPadding(dp(20), dp(16), dp(20), 0);
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Bearer criado")
-                .setMessage("Guarda este bearer agora. Não será possível consultá-lo novamente.")
+                .setTitle(getString(R.string.token_created))
+                .setMessage(getString(R.string.save_this_token_now_it_cannot_be_retrieved_again))
                 .setView(tokenView)
-                .setNegativeButton("Copiar", null)
-                .setPositiveButton("Concluído", (ignored, which) -> finish())
+                .setNegativeButton(getString(R.string.copy), null)
+                .setPositiveButton(getString(R.string.done), (ignored, which) -> finish())
                 .setCancelable(false)
                 .create();
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
                 .setOnClickListener(view -> {
                     ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboard.setPrimaryClip(ClipData.newPlainText("Bearer", token));
-                    Toast.makeText(this, "Bearer copiado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.token_copied), Toast.LENGTH_SHORT).show();
                 }));
         dialog.show();
     }
 
     private void confirmDelete() {
         new AlertDialog.Builder(this)
-                .setTitle("Eliminar utilizador?")
-                .setMessage("O bearer deste utilizador deixará de funcionar imediatamente.")
-                .setNegativeButton("Cancelar", null)
-                .setPositiveButton("Eliminar", (dialog, which) -> deleteUser())
+                .setTitle(getString(R.string.delete_user))
+                .setMessage(getString(R.string.this_user_s_token_will_stop_working_immediately))
+                .setNegativeButton(getString(R.string.cancel), null)
+                .setPositiveButton(getString(R.string.delete), (dialog, which) -> deleteUser())
                 .show();
     }
 
@@ -374,7 +373,7 @@ public final class UserEditActivity extends Activity {
                 if (!result.successful) {
                     showError(result.message);
                 } else {
-                    Toast.makeText(this, "Utilizador eliminado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.user_deleted), Toast.LENGTH_SHORT).show();
                     finish();
                 }
             });
@@ -382,8 +381,12 @@ public final class UserEditActivity extends Activity {
     }
 
     private Credentials credentials() {
+        if (settings.getString(SERVER_URL, DEFAULT_SERVER_URL).trim().isEmpty()) {
+            showError(getString(R.string.server_not_configured_in_settings));
+            return null;
+        }
         if (!secretStore.hasBearer()) {
-            showError("Bearer não configurado");
+            showError(getString(R.string.bearer_token_not_configured));
             return null;
         }
         try {
@@ -392,7 +395,7 @@ public final class UserEditActivity extends Activity {
                     secretStore.getBearer()
             );
         } catch (Exception error) {
-            showError("Não foi possível ler o bearer");
+            showError(getString(R.string.could_not_read_the_bearer_token));
             return null;
         }
     }

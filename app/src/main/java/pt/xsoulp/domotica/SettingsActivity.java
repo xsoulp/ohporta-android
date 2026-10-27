@@ -19,8 +19,7 @@ import android.widget.Toast;
 public final class SettingsActivity extends Activity {
     private static final String SETTINGS = "app_settings";
     private static final String SERVER_URL = "server_url";
-    private static final String DEFAULT_SERVER_URL = "https://example.invalid";
-    private static final String LEGACY_SERVER_HOST = "192.0.2.1";
+    private static final String DEFAULT_SERVER_URL = "";
     private SecretStore secretStore;
     private SharedPreferences settings;
 
@@ -35,13 +34,9 @@ public final class SettingsActivity extends Activity {
         EditText bearerInput = findViewById(R.id.bearerInput);
         EditText serverInput = findViewById(R.id.serverInput);
         String configuredServer = settings.getString(SERVER_URL, DEFAULT_SERVER_URL);
-        if (configuredServer != null && configuredServer.contains(LEGACY_SERVER_HOST)) {
-            configuredServer = DEFAULT_SERVER_URL;
-            settings.edit().putString(SERVER_URL, configuredServer).apply();
-        }
         serverInput.setText(configuredServer);
         if (secretStore.hasBearer()) {
-            bearerInput.setHint("Bearer guardado — deixa vazio para manter");
+            bearerInput.setHint(getString(R.string.token_saved_leave_blank_to_keep_it));
         }
 
         findViewById(R.id.backButton).setOnClickListener(view -> finish());
@@ -49,11 +44,15 @@ public final class SettingsActivity extends Activity {
             String bearer = bearerInput.getText().toString().trim();
             String server = serverInput.getText().toString().trim();
             if (!secretStore.hasBearer() && bearer.isEmpty()) {
-                bearerInput.setError("Bearer obrigatório");
+                bearerInput.setError(getString(R.string.bearer_token_required));
+                return;
+            }
+            if (server.isEmpty()) {
+                serverInput.setError(getString(R.string.server_required));
                 return;
             }
             if (!server.startsWith("http://") && !server.startsWith("https://")) {
-                serverInput.setError("Usa http:// ou https://");
+                serverInput.setError(getString(R.string.use_http_or_https));
                 return;
             }
             try {
@@ -61,10 +60,10 @@ public final class SettingsActivity extends Activity {
                     secretStore.saveBearer(bearer);
                 }
                 settings.edit().putString(SERVER_URL, server).apply();
-                Toast.makeText(this, "Definições guardadas", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.settings_saved), Toast.LENGTH_SHORT).show();
                 finish();
             } catch (Exception error) {
-                Toast.makeText(this, "Não foi possível guardar o bearer", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.could_not_save_the_bearer_token), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -86,23 +85,35 @@ public final class SettingsActivity extends Activity {
     private void updateStatuses() {
         TextView networkStatus = findViewById(R.id.networkStatus);
         boolean online = hasNetwork();
-        networkStatus.setText(online ? "●  Online" : "●  Offline");
+        networkStatus.setText(online ? getString(R.string.online_2) : getString(R.string.offline_2));
         networkStatus.setTextColor(getColor(online ? R.color.success : R.color.danger));
 
         TextView biometricStatus = findViewById(R.id.biometricStatus);
+        KeyguardManager keyguardManager = getSystemService(KeyguardManager.class);
+        boolean deviceCredentialActive = keyguardManager != null && keyguardManager.isDeviceSecure();
+        if (!BuildConfig.USE_BIOMETRIC_AUTH) {
+            biometricStatus.setText(
+                    deviceCredentialActive
+                            ? getString(R.string.pin_screen_lock_enabled)
+                            : getString(R.string.screen_lock_not_configured)
+            );
+            biometricStatus.setTextColor(getColor(
+                    deviceCredentialActive ? R.color.success : R.color.danger
+            ));
+            return;
+        }
+
         BiometricManager manager = getSystemService(BiometricManager.class);
         boolean biometricActive = manager != null
                 && manager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)
                 == BiometricManager.BIOMETRIC_SUCCESS;
-        KeyguardManager keyguardManager = getSystemService(KeyguardManager.class);
-        boolean deviceCredentialActive = keyguardManager != null && keyguardManager.isDeviceSecure();
         boolean active = biometricActive || deviceCredentialActive;
         biometricStatus.setText(
                 biometricActive
-                        ? "●  Impressão digital ou PIN ativos"
+                        ? getString(R.string.fingerprint_or_pin_enabled)
                         : (deviceCredentialActive
-                                ? "●  PIN/bloqueio de ecrã ativo"
-                                : "●  Bloqueio não configurado")
+                                ? getString(R.string.pin_screen_lock_enabled)
+                                : getString(R.string.screen_lock_not_configured))
         );
         biometricStatus.setTextColor(getColor(active ? R.color.success : R.color.danger));
     }

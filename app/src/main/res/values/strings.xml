@@ -1,4 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Domótica</string>
+    <string name="app_name" translatable="false">APT Access</string>
+    <string name="brand_name" translatable="false">APT ACCESS</string>
+    <string name="door_apt" translatable="false">APT</string>
+    <string name="door_bld" translatable="false">BLD</string>
+    <string name="bearer_label" translatable="false">Bearer</string>
+    <string name="author_credit" translatable="false">Created by Luis Pinto - 2026</string>
+    <string name="back_symbol" translatable="false">‹</string>
+    <string name="your_entrance_always_with_you">"YOUR ENTRANCE. ALWAYS WITH YOU."</string>
+    <string name="apt_access_nversion_1_5_ncreated_by_luis_pinto_2026">"APT Access\nVersion 1.5\nCreated by Luis Pinto - 2026"</string>
+    <string name="open_door">"Open door"</string>
+    <string name="open_apartment_door_press_and_hold_for_more_actions">"Open apartment door. Press and hold for more actions."</string>
+    <string name="open_building_door">"Open building door"</string>
+    <string name="remote_access">"Remote access"</string>
+    <string name="access_in_the_last_2_days">"Access in the last 2 days"</string>
+    <string name="add_periods_and_choose_the_days_of_the_week">"Add periods and choose the days of the week."</string>
+    <string name="authentication">"Authentication"</string>
+    <string name="secure_device_authentication">"Secure device authentication"</string>
+    <string name="cancel">"Cancel"</string>
+    <string name="connectivity">"Connectivity"</string>
+    <string name="set_the_credential_used_to_communicate_with_your_access_system">"Set the credential used to communicate with your access system."</string>
+    <string name="settings">"Settings"</string>
+    <string name="off_access_only_within_the_local_100_metre_zone">"Off: access only within the local 100-metre zone."</string>
+    <string name="unlocks_the_apartment_door">"Unlocks the apartment door"</string>
+    <string name="edit_user">"Edit user"</string>
+    <string name="delete">"Delete"</string>
+    <string name="server_address">"Server address"</string>
+    <string name="residence_entrance">"Residence entrance"</string>
+    <string name="sends_the_open_command">"Sends the open command"</string>
+    <string name="network_status">"Network status"</string>
+    <string name="close">"Close"</string>
+    <string name="manage_access_and_permissions">"Manage access and permissions"</string>
+    <string name="save">"Save"</string>
+    <string name="allowed_schedules">"Allowed schedules"</string>
+    <string name="connected_to_service">"Connected to service"</string>
+    <string name="lock">"Lock"</string>
+    <string name="my_residence_n_online">"My Residence\n●  Online"</string>
+    <string name="name">"Name"</string>
+    <string name="user_name">"User name"</string>
+    <string name="search_users">"Search users…"</string>
+    <string name="apartment_door">"Apartment door"</string>
+    <string name="ready">"Ready"</string>
+    <string name="about">"About"</string>
+    <string name="locks_the_apartment_door">"Locks the apartment door"</string>
+    <string name="unlock">"Unlock"</string>
+    <string name="user">"User"</string>
+    <string name="user_enabled">"User enabled"</string>
+    <string name="users">"Users"</string>
+    <string name="back">"Back"</string>
+    <string name="save_2">"▣  Save"</string>
+    <string name="checking">"●  Checking…"</string>
+    <string name="add_period">"＋ Add period"</string>
+    <string name="new_user_short">"＋ New"</string>
+    <string name="open_apartment">"Open apartment"</string>
+    <string name="apartment_opening_unavailable">"Apartment opening unavailable"</string>
+    <string name="open_building">"Open building"</string>
+    <string name="checking_2">"Checking…"</string>
+    <string name="set_your_server_in_settings">"Set your server in Settings"</string>
+    <string name="set_your_bearer_token_in_settings">"Set your bearer token in Settings"</string>
+    <string name="location_permission_is_required">"Location permission is required"</string>
+    <string name="no_network_connection">"No network connection"</string>
+    <string name="confirm_with_your_fingerprint">"Confirm with your fingerprint"</string>
+    <string name="use_pin">"Use PIN"</string>
+    <string name="fingerprint_not_recognised">"Fingerprint not recognised"</string>
+    <string name="set_up_a_device_pin_pattern_or_password">"Set up a device PIN, pattern, or password"</string>
+    <string name="confirm_with_your_device_pin_pattern_or_password">"Confirm with your device PIN, pattern, or password"</string>
+    <string name="could_not_open_device_authentication">"Could not open device authentication"</string>
+    <string name="getting_precise_location">"Getting precise location…"</string>
+    <string name="location_permission_missing">"Location permission missing"</string>
+    <string name="location_service_unavailable">"Location service unavailable"</string>
+    <string name="enable_location_in_settings">"Enable location in Settings"</string>
+    <string name="could_not_get_location">"Could not get location"</string>
+    <string name="location_unavailable">"Location unavailable"</string>
+    <string name="location_disabled">"Location disabled"</string>
+    <string name="precise_location_is_required_to_check_your_distance_from_the_door">"Precise location is required to check your distance from the doors."</string>
+    <string name="open_settings">"Open Settings"</string>
+    <string name="could_not_read_the_bearer_token">"Could not read the bearer token"</string>
+    <string name="checking_access">"Checking access…"</string>
+    <string name="apartment_opening_unavailable_press_and_hold_to_lock_or_unlock">"Apartment opening unavailable. Press and hold to lock or unlock."</string>
+    <string name="access_updated">"Access updated"</string>
+    <string name="online">"Online"</string>
+    <string name="offline">"Offline"</string>
+    <string name="locating">"  •  Locating…"</string>
+    <string name="my_residence_n">"My Residence\n●  "</string>
+    <string name="apartment_opening_unavailable_2">"Apartment opening unavailable: "</string>
+    <string name="building_opening_unavailable">"Building opening unavailable: "</string>
+    <string name="unavailable">"UNAVAILABLE"</string>
+    <string name="unavailable_2">"Unavailable"</string>
+    <string name="updating">"Updating…"</string>
+    <string name="no_access_events_in_the_last_2_days">"No access events in the last 2 days."</string>
+    <string name="lock_2">"Lock"</string>
+    <string name="unlock_2">"Unlock"</string>
+    <string name="open">"Open"</string>
+    <string name="running">"Running…"</string>
+    <string name="done">"Done"</string>
+    <string name="open_apartment_door">"Open apartment door"</string>
+    <string name="disconnected_from_service">"Disconnected from service"</string>
+    <string name="allow_precise_location_to_continue">"Allow precise location to continue"</string>
+    <string name="token_saved_leave_blank_to_keep_it">"Token saved — leave blank to keep it"</string>
+    <string name="bearer_token_required">"Bearer token required"</string>
+    <string name="server_required">"Server required"</string>
+    <string name="use_http_or_https">"Use http:// or https://"</string>
+    <string name="settings_saved">"Settings saved"</string>
+    <string name="could_not_save_the_bearer_token">"Could not save the bearer token"</string>
+    <string name="online_2">"●  Online"</string>
+    <string name="offline_2">"●  Offline"</string>
+    <string name="pin_screen_lock_enabled">"●  PIN/screen lock enabled"</string>
+    <string name="screen_lock_not_configured">"●  Screen lock not configured"</string>
+    <string name="fingerprint_or_pin_enabled">"●  Fingerprint or PIN enabled"</string>
+    <string name="new_user">"New user"</string>
+    <string name="administrator">"Administrator"</string>
+    <string name="name_required">"Name required"</string>
+    <string name="user_saved">"User saved"</string>
+    <string name="user_created_but_the_server_did_not_return_a_token">"User created, but the server did not return a token"</string>
+    <string name="token_created">"Token created"</string>
+    <string name="save_this_token_now_it_cannot_be_retrieved_again">"Save this token now. It cannot be retrieved again."</string>
+    <string name="copy">"Copy"</string>
+    <string name="token_copied">"Token copied"</string>
+    <string name="delete_user">"Delete user?"</string>
+    <string name="this_user_s_token_will_stop_working_immediately">"This user\'s token will stop working immediately."</string>
+    <string name="user_deleted">"User deleted"</string>
+    <string name="server_not_configured_in_settings">"Server not configured in Settings"</string>
+    <string name="bearer_token_not_configured">"Bearer token not configured"</string>
+    <string name="no_users">"No users"</string>
+    <string name="no_results">"No results"</string>
+    <string name="local_only">"Local only"</string>
+    <string name="remote">"Remote"</string>
+    <string name="active">"●  Active"</string>
+    <string name="inactive">"●  Inactive"</string>
+    <string name="no_access_schedule">"No access schedule"</string>
+    <string name="every_day">"Every day"</string>
+    <string name="mon_fri">"Mon–Fri"</string>
+    <string name="mon">"Mon"</string>
+    <string name="tue">"Tue"</string>
+    <string name="wed">"Wed"</string>
+    <string name="thu">"Thu"</string>
+    <string name="fri">"Fri"</string>
+    <string name="sat">"Sat"</string>
+    <string name="sun">"Sun"</string>
+    <string name="connection_failed">"Connection failed"</string>
+    <string name="could_not_retrieve_available_access">"Could not retrieve available access"</string>
+    <string name="could_not_retrieve_users">"Could not retrieve users"</string>
+    <string name="could_not_retrieve_history">"Could not retrieve history"</string>
+    <string name="could_not_delete_user">"Could not delete user"</string>
+    <string name="could_not_save_user">"Could not save user"</string>
+    <string name="invalid_user_data">"Invalid user data"</string>
+    <string name="unknown_access_mode">"Unknown access mode"</string>
+    <string name="invalid_distance">"Invalid distance"</string>
+    <string name="http_response">"HTTP response "</string>
+    <string name="door_unavailable">"%1$s opening unavailable"</string>
+    <string name="open_door_remote">"Open %1$s remotely%2$s"</string>
+    <string name="open_door_distance">"Open %1$s%2$s"</string>
+    <string-array name="weekdays_short">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
 </resources>

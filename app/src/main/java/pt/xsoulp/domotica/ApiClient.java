@@ -208,7 +208,7 @@ final class ApiClient {
             );
             return new Result(response.successful(), responseMessage(response.body, response.code));
         } catch (Exception error) {
-            return new Result(false, errorMessage(error, "Falha de ligação"));
+            return new Result(false, errorMessage(error, App.text(R.string.connection_failed)));
         }
     }
 
@@ -241,7 +241,7 @@ final class ApiClient {
             );
         } catch (Exception error) {
             return CapabilitiesResult.failure(
-                    errorMessage(error, "Falha ao obter acessos disponíveis")
+                    errorMessage(error, App.text(R.string.could_not_retrieve_available_access))
             );
         }
     }
@@ -267,7 +267,7 @@ final class ApiClient {
         } catch (Exception error) {
             return new UsersResult(
                     false,
-                    errorMessage(error, "Falha ao obter utilizadores"),
+                    errorMessage(error, App.text(R.string.could_not_retrieve_users)),
                     Collections.emptyList()
             );
         }
@@ -312,7 +312,7 @@ final class ApiClient {
         } catch (Exception error) {
             return new AccessHistoryResult(
                     false,
-                    errorMessage(error, "Falha ao obter histórico"),
+                    errorMessage(error, App.text(R.string.could_not_retrieve_history)),
                     Collections.emptyList()
             );
         }
@@ -349,7 +349,7 @@ final class ApiClient {
             );
             return new Result(response.successful(), responseMessage(response.body, response.code));
         } catch (Exception error) {
-            return new Result(false, errorMessage(error, "Falha ao eliminar utilizador"));
+            return new Result(false, errorMessage(error, App.text(R.string.could_not_delete_user)));
         }
     }
 
@@ -382,7 +382,7 @@ final class ApiClient {
         } catch (Exception error) {
             return new UserResult(
                     false,
-                    errorMessage(error, "Falha ao guardar utilizador"),
+                    errorMessage(error, App.text(R.string.could_not_save_user)),
                     null,
                     null
             );
@@ -406,7 +406,7 @@ final class ApiClient {
             payload.put("schedules", schedules);
             return payload;
         } catch (Exception error) {
-            throw new IllegalArgumentException("Dados de utilizador inválidos", error);
+            throw new IllegalArgumentException(App.text(R.string.invalid_user_data), error);
         }
     }
 
@@ -440,13 +440,13 @@ final class ApiClient {
         boolean canOpen = json.getBoolean("can_open");
         String mode = json.getString("mode");
         if (!mode.equals("local") && !mode.equals("remote")) {
-            throw new IllegalArgumentException("Modo de acesso desconhecido");
+            throw new IllegalArgumentException(App.text(R.string.unknown_access_mode));
         }
         Double distanceM = null;
         if (json.has("distance_m") && !json.isNull("distance_m")) {
             double value = json.getDouble("distance_m");
             if (!Double.isFinite(value) || value < 0.0) {
-                throw new IllegalArgumentException("Distância inválida");
+                throw new IllegalArgumentException(App.text(R.string.invalid_distance));
             }
             distanceM = value;
         }
@@ -540,12 +540,11 @@ final class ApiClient {
         } catch (Exception ignored) {
             // Fall back to the raw response below.
         }
-        return body.isBlank() ? "Resposta HTTP " + code : body;
+        return body.isBlank() ? App.text(R.string.http_response) + code : body;
     }
 
     private static String errorMessage(Exception error, String fallback) {
-        String message = error.getMessage();
-        return message == null || message.isBlank() ? fallback : message;
+        return fallback;
     }
 
     private ApiClient() {

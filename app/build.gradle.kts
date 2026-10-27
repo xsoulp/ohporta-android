@@ -10,12 +10,34 @@ android {
         applicationId = "pt.xsoulp.domotica"
         minSdk = 30
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.4"
+        versionCode = 6
+        versionName = "1.5"
+
+        buildConfigField("boolean", "USE_BIOMETRIC_AUTH", "true")
     }
 
     buildFeatures {
-        buildConfig = false
+        buildConfig = true
+    }
+
+    buildTypes {
+        create("preview") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".preview"
+            versionNameSuffix = "-preview"
+        }
+        create("pin") {
+            initWith(getByName("debug"))
+            isDebuggable = true
+            versionNameSuffix = "-pin"
+            buildConfigField("boolean", "USE_BIOMETRIC_AUTH", "false")
+        }
+        create("pixel8a") {
+            initWith(getByName("debug"))
+            isDebuggable = true
+            versionNameSuffix = "-pixel-8a"
+            buildConfigField("boolean", "USE_BIOMETRIC_AUTH", "true")
+        }
     }
 
     compileOptions {
