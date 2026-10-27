@@ -1,4 +1,4 @@
-package pt.xsoulp.domotica;
+package com.xsoulp.ohporta;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,7 +15,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
 final class SecretStore {
-    private static final String KEY_ALIAS = "domotica_bearer_key";
+    private static final String KEY_ALIAS = "ohporta_bearer_key";
     private static final String PREFS = "secure_settings";
     private static final String TOKEN = "bearer_ciphertext";
     private static final String IV = "bearer_iv";

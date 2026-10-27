@@ -7,3 +7,4 @@ dist/
 captures/
 .DS_Store
 artifacts/
+.vscode/

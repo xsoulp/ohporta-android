@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Domotica"
+rootProject.name = "OhPorta"
 include(":app")

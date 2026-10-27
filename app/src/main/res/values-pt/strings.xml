@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="your_entrance_always_with_you">"A SUA ENTRADA, SEMPRE CONSIGO."</string>
-    <string name="apt_access_nversion_1_5_ncreated_by_luis_pinto_2026">"APT Access\nVersão 1.5\nCreated by Luis Pinto - 2026"</string>
+    <string name="about_app">"OhPorta\nVersão 1.6\nCreated by Luis Pinto - 2026"</string>
     <string name="open_door">"Abrir porta"</string>
     <string name="open_apartment_door_press_and_hold_for_more_actions">"Abrir porta do apartamento. Manter premido para mais ações."</string>
     <string name="open_building_door">"Abrir porta do prédio"</string>

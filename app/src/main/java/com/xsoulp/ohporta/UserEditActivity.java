@@ -1,4 +1,4 @@
-package pt.xsoulp.domotica;
+package com.xsoulp.ohporta;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Switch;
@@ -212,30 +211,45 @@ public final class UserEditActivity extends Activity {
         times.addView(remove, new LinearLayout.LayoutParams(dp(48), dp(48)));
         root.addView(times);
 
-        HorizontalScrollView daysScroll = new HorizontalScrollView(this);
-        daysScroll.setHorizontalScrollBarEnabled(false);
         LinearLayout days = new LinearLayout(this);
-        days.setOrientation(LinearLayout.HORIZONTAL);
-        days.setPadding(0, dp(7), 0, 0);
+        days.setOrientation(LinearLayout.VERTICAL);
+        days.setPadding(0, dp(8), 0, 0);
+        String[] dayLabels = getResources().getStringArray(R.array.weekdays_short);
         List<ToggleButton> buttons = new ArrayList<>();
+        LinearLayout dayRow = null;
         for (int index = 0; index < DAYS.length; index++) {
+            if (index % 4 == 0) {
+                dayRow = new LinearLayout(this);
+                dayRow.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                if (index > 0) {
+                    rowParams.topMargin = dp(6);
+                }
+                days.addView(dayRow, rowParams);
+            }
             ToggleButton button = new ToggleButton(this);
-            button.setTextOn(getResources().getStringArray(R.array.weekdays_short)[index]);
-            button.setTextOff(getResources().getStringArray(R.array.weekdays_short)[index]);
-            button.setText(getResources().getStringArray(R.array.weekdays_short)[index]);
-            button.setTextSize(12);
+            button.setTextOn(dayLabels[index]);
+            button.setTextOff(dayLabels[index]);
+            button.setText(dayLabels[index]);
+            button.setTextSize(13);
             button.setAllCaps(false);
+            button.setMinWidth(0);
+            button.setPadding(0, 0, 0, 0);
             button.setBackgroundResource(R.drawable.schedule_day_background);
             button.setBackgroundTintList(null);
             button.setTextColor(getColorStateList(R.color.schedule_day_text));
             button.setChecked(schedule.allowedDays.contains(DAYS[index]));
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(54), dp(44));
-            params.setMargins(0, 0, dp(4), 0);
-            days.addView(button, params);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(48), 1);
+            if (index % 4 > 0) {
+                params.setMarginStart(dp(6));
+            }
+            dayRow.addView(button, params);
             buttons.add(button);
         }
-        daysScroll.addView(days);
-        root.addView(daysScroll);
+        root.addView(days);
         periodsContainer.addView(root);
 
         ScheduleRow row = new ScheduleRow(root, start, end, buttons);

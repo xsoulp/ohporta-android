@@ -1,4 +1,4 @@
-package pt.xsoulp.domotica;
+package com.xsoulp.ohporta;
 
 import android.Manifest;
 import android.app.Activity;

@@ -1,4 +1,4 @@
-<h1 align="center">APT Access</h1>
+<h1 align="center">OhPorta</h1>
 
 <p align="center">
   <strong>Apartment and building access, from your Android phone.</strong><br>
@@ -15,7 +15,7 @@
 
 ---
 
-APT Access is a native Android client with English and European Portuguese interfaces, biometric confirmation for door operations, and administrator tools for managing who can enter and when.
+OhPorta is a native Android client with English and European Portuguese interfaces, biometric confirmation for door operations, and administrator tools for managing who can enter and when.
 
 **Bring your own backend.** No server is configured by default. You need a compatible access-control API and a bearer token issued by its administrator. This repository contains the Android app; the server and door hardware are separate.
 
@@ -66,14 +66,14 @@ Actual app screens captured on a Google Pixel 8a. The Preview build uses fiction
 
 ## Downloads
 
-Get the APKs from [GitHub Releases](https://github.com/xsoulp/domotica_androidapp/releases):
+Get the APKs from [GitHub Releases](../../releases):
 
 | APK | Authentication |
 | :--- | :--- |
-| [**Fingerprint APK**](https://github.com/xsoulp/domotica_androidapp/releases/download/v1.5/APT-Access-1.5-fingerprint.apk) | Strong biometric authentication with device PIN, pattern, or password as a fallback. |
-| [**PIN APK**](https://github.com/xsoulp/domotica_androidapp/releases/download/v1.5/APT-Access-1.5-pin.apk) | Device PIN, pattern, or password, without prompting for a fingerprint. |
+| [**Fingerprint APK**](../../releases/download/v1.6/OhPorta-1.6-fingerprint.apk) | Strong biometric authentication with device PIN, pattern, or password as a fallback. |
+| [**PIN APK**](../../releases/download/v1.6/OhPorta-1.6-pin.apk) | Device PIN, pattern, or password, without prompting for a fingerprint. |
 
-Both variants require Android 11+ and a configured screen lock. The published APKs use the same app ID and signing key, so installing one replaces the other while keeping settings. The APKs use debug signing and are sideload builds. Release APKs retain the project's existing signing identity, so updates preserve saved settings. Independently built APKs may use a different signing key.
+Both variants require Android 11+ and a configured screen lock. The published APKs use the same app ID (`com.xsoulp.ohporta`) and signing key, so installing one replaces the other while keeping settings. The APKs use debug signing and are sideload builds. Updates within OhPorta preserve saved settings. OhPorta has a new application ID, so it installs separately from the former APT Access app; users moving from that app need to configure their server and token. Independently built APKs may use a different signing key.
 
 ## Getting started
 
@@ -105,7 +105,7 @@ The app identifies the user from the token. Administrator controls appear for us
 | Minimum Android | 11 / API 30 |
 | Android Gradle Plugin | 9.4.0 |
 | Gradle wrapper | 9.6.0 |
-| App | 1.5 |
+| App | 1.6 |
 
 Install the Android SDK and configure its location using `ANDROID_HOME` or an untracked `local.properties` file with `sdk.dir` pointing to your SDK directory. Then run:
 
@@ -121,18 +121,9 @@ Build outputs:
 On Windows, use `gradlew.bat`.
 
 <details>
-<summary><strong>Google Pixel 8a build variant</strong></summary>
+<summary><strong>Isolated development preview</strong></summary>
 
-The project also includes a debug-derived Pixel 8a variant with biometric authentication enabled. Device PIN, pattern, or password remains available as a fallback.
-
-```bash
-./gradlew assemblePixel8a
-adb install -r app/build/outputs/apk/pixel8a/app-pixel8a.apk
-```
-
-The standard debug build also enables biometric authentication.
-
-For isolated UI testing, `./gradlew assemblePreview` produces an **APT Access Preview** app with a separate application ID and separate saved settings. It does not share credentials with the installed app.
+`./gradlew assemblePreview` produces an **OhPorta Preview** app with a separate application ID and separate saved settings. Use it for UI testing without sharing credentials with the installed app.
 
 </details>
 
@@ -156,7 +147,7 @@ Created by **Luis Pinto** · 2026
 
 ```text
 app/src/main/
-├── java/pt/xsoulp/domotica/   Activities, API client, and credential storage
+├── java/com/xsoulp/ohporta/   Activities, API client, and credential storage
 ├── res/layout/              Native Android screen layouts
 ├── res/drawable/            Icons, backgrounds, and visual components
 └── AndroidManifest.xml      App configuration and permissions

@@ -1,4 +1,4 @@
-package pt.xsoulp.domotica;
+package com.xsoulp.ohporta;
 
 import android.animation.ValueAnimator;
 import android.content.Context;

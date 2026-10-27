@@ -1,4 +1,4 @@
-# Backend API for APT Access
+# Backend API for OhPorta
 
 This guide describes the HTTP contract expected by the Android client. The repository does not include a backend or a door controller. Implement the service with your preferred framework and connect the door commands to your own hardware.
 
@@ -188,4 +188,4 @@ Return an empty `entries` array when there is no history. The app requests up to
 4. Add recent-event storage and the history endpoint.
 5. Check that unauthorized requests cannot operate hardware or use administrator routes, regardless of what the phone UI displays.
 
-The definitive client implementation is [ApiClient.java](../app/src/main/java/pt/xsoulp/domotica/ApiClient.java).
+The definitive client implementation is [ApiClient.java](../app/src/main/java/com/xsoulp/ohporta/ApiClient.java).

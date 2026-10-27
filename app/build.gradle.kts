@@ -3,15 +3,15 @@ plugins {
 }
 
 android {
-    namespace = "pt.xsoulp.domotica"
+    namespace = "com.xsoulp.ohporta"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "pt.xsoulp.domotica"
+        applicationId = "com.xsoulp.ohporta"
         minSdk = 30
         targetSdk = 36
-        versionCode = 6
-        versionName = "1.5"
+        versionCode = 7
+        versionName = "1.6"
 
         buildConfigField("boolean", "USE_BIOMETRIC_AUTH", "true")
     }
@@ -31,12 +31,6 @@ android {
             isDebuggable = true
             versionNameSuffix = "-pin"
             buildConfigField("boolean", "USE_BIOMETRIC_AUTH", "false")
-        }
-        create("pixel8a") {
-            initWith(getByName("debug"))
-            isDebuggable = true
-            versionNameSuffix = "-pixel-8a"
-            buildConfigField("boolean", "USE_BIOMETRIC_AUTH", "true")
         }
     }
 
