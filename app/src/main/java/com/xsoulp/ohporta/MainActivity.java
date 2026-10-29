@@ -51,6 +51,7 @@ public final class MainActivity extends Activity {
     private static final int LOCATION_PERMISSION_REQUEST = 10;
     private static final int DEVICE_CREDENTIAL_REQUEST = 11;
     private static final long MAX_CACHED_LOCATION_AGE_NS = 20_000_000_000L;
+    private static final long VALIDATED_LOCATION_MAX_AGE_NS = 120_000_000_000L;
     private static final float MAX_CACHED_LOCATION_ACCURACY_M = 100.0f;
     private static final String SETTINGS = "app_settings";
     private static final String SERVER_URL = "server_url";
@@ -79,6 +80,7 @@ public final class MainActivity extends Activity {
     private LinearLayout accessHistoryContainer;
     private TextView accessHistoryMessage;
     private CancellationSignal locationCancellation;
+    private Location validatedLocation;
     private boolean aptCanOpen;
     private boolean bldCanOpen;
     private boolean adminUser;
@@ -186,7 +188,7 @@ public final class MainActivity extends Activity {
             return;
         }
 
-        if (!hasLocationProvider()) {
+        if (findValidatedLocation() == null && !hasLocationProvider()) {
             showEnableLocationDialog();
             return;
         }
@@ -309,6 +311,12 @@ public final class MainActivity extends Activity {
             return;
         }
 
+        Location validated = findValidatedLocation();
+        if (validated != null) {
+            callback.onLocation(validated);
+            return;
+        }
+
         LocationManager manager = getSystemService(LocationManager.class);
         if (manager == null) {
             callback.onError(getString(R.string.location_service_unavailable));
@@ -356,6 +364,19 @@ public final class MainActivity extends Activity {
                     }
                 }
         );
+    }
+
+    private Location findValidatedLocation() {
+        if (validatedLocation != null) {
+            // Use the fix's original age so repeated operations never extend the window.
+            long age = SystemClock.elapsedRealtimeNanos()
+                    - validatedLocation.getElapsedRealtimeNanos();
+            if (age >= 0 && age < VALIDATED_LOCATION_MAX_AGE_NS) {
+                return new Location(validatedLocation);
+            }
+            validatedLocation = null;
+        }
+        return null;
     }
 
     private String findEnabledLocationProvider(LocationManager manager) {
@@ -481,6 +502,9 @@ public final class MainActivity extends Activity {
                             usersButton.setVisibility(View.GONE);
                             capabilitiesFailed(result.message);
                             return;
+                        }
+                        if (result.apartment.canOpen || result.building.canOpen) {
+                            validatedLocation = new Location(location);
                         }
                         adminUser = result.user != null && result.user.isAdmin();
                         usersButton.setVisibility(adminUser ? View.VISIBLE : View.GONE);
@@ -730,6 +754,9 @@ public final class MainActivity extends Activity {
         networkExecutor.execute(() -> {
             ApiClient.Result result = ApiClient.post(serverUrl, path, bearer, location);
             runOnUiThread(() -> {
+                if (result.successful) {
+                    validatedLocation = new Location(location);
+                }
                 setBusy(false, result.successful ? getString(R.string.done) : result.message);
                 statusText.setTextColor(getColor(
                         result.successful ? R.color.primary_dark : R.color.danger

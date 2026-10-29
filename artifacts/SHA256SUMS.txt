@@ -1,0 +1,2 @@
+029c9b1aa85df84e3701f0dedde5997c2a790ad16e024208d20c2c9ea41dde9c  OhPorta-1.8-fingerprint.apk
+ca5e8a660929365b8af4b48361c1c1a34abbb34a0809886e31d4f40b65ca5475  OhPorta-1.8-pin.apk

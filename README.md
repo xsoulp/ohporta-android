@@ -61,12 +61,14 @@ See the [Portuguese interface screenshots](docs/SCREENSHOTS.md) for PT-PT exampl
 
 ## Downloads
 
-Get the APKs from [GitHub Releases](../../releases):
+Download the APK for your preferred authentication method:
 
 | APK | Authentication |
 | :--- | :--- |
-| [**Fingerprint APK**](../../releases/download/v1.7/OhPorta-1.7-fingerprint.apk) | Strong biometric authentication with device PIN, pattern, or password as a fallback. |
-| [**PIN APK**](../../releases/download/v1.7/OhPorta-1.7-pin.apk) | Device PIN, pattern, or password, without prompting for a fingerprint. |
+| [**Fingerprint APK**](artifacts/OhPorta-1.8-fingerprint.apk) | Strong biometric authentication with device PIN, pattern, or password as a fallback. |
+| [**PIN APK**](artifacts/OhPorta-1.8-pin.apk) | Device PIN, pattern, or password, without prompting for a fingerprint. |
+
+Verify downloads using [SHA256 checksums](artifacts/SHA256SUMS.txt). Version 1.8 reuses a server-accepted location for up to two minutes across BLD and APT operations, without extending the window on reuse.
 
 Both variants require Android 11+ and a configured screen lock. The published APKs use the same app ID (`com.xsoulp.ohporta`) and signing key, so installing one replaces the other while keeping settings. The APKs use debug signing and are sideload builds. Updates within OhPorta preserve saved settings. OhPorta has a new application ID, so it installs separately from the former APT Access app; users moving from that app need to configure their server and token. Independently built APKs may use a different signing key.
 
